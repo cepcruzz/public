@@ -25,15 +25,6 @@ param(
     if (
     $PersonalAccessToken = Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name $KeyVaultSecret
     Write-Verbose -Message "Found secret $($PersonalAccessToken.Id)"
-    
-    #Add Azure DevOps Profile from the desired account
-    Add-VSTeamProfile -Account $DevOpsAccount -Name $DevOpsAccount -SecurePersonalAccessToken $PersonalAccessToken.SecretValue
-    #Set the active profile
-    Set-VSTeamAccount -Profile $DevOpsAccount
-    
-    #Get Available DevOps Projects 
-    $Projects = Get-VSTeamProject
-    Write-Verbose -Message "Connected to https://dev.azure.com/$DevOpsAccount - $($Projects.Count) projects available"
     } 
 catch {
     Write-Error -Message $_
