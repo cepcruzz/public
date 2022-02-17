@@ -19,35 +19,14 @@ param(
     [Parameter(Mandatory=$true)][string]$groupName
  )
 
- <#
- try {
-     #Try to fetch personal access token from Azure Key Vault
-    if (
-    $PersonalAccessToken = Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name $KeyVaultSecret
-    Write-Verbose -Message "Found secret $($PersonalAccessToken.Id)"
-    
-    #Add Azure DevOps Profile from the desired account
-    Add-VSTeamProfile -Account $DevOpsAccount -Name $DevOpsAccount -SecurePersonalAccessToken $PersonalAccessToken.SecretValue
-    #Set the active profile
-    Set-VSTeamAccount -Profile $DevOpsAccount
-    
-    #Get Available DevOps Projects 
-    $Projects = Get-VSTeamProject
-    Write-Verbose -Message "Connected to https://dev.azure.com/$DevOpsAccount - $($Projects.Count) projects available"
-    } 
-catch {
-    Write-Error -Message $_
-    break
-}#>
-
 #Map of allowed environment prefixes and associated subsription name & jumphost subnets
 $spokeMap = @{
-    "PRE" = @{"url"="pre-git.bacardiapps.com"};
-    "PRO" = @{"url"="git.bacardiapps.com"};
+    "PRE" = @{"url"="pre-git.xxxxxxxx.com"};
+    "PRO" = @{"url"="git.xxxxxxx.com"};
 }
 
 $gitserver=$spokeMap[$envPrefix]["url"]
-$pat="glpat-m-QRvEemstcP63saiSBH"
+$pat="glpat-x-xxxxxx"
 
 #Add headers to the request with our $Token set
 $headers = @{
@@ -110,8 +89,8 @@ write-output "(4/5) Creating new project repository"
 #Create project
 $groupID = $group.id
 try {
-    $createdProject = Invoke-RestMethod -Headers $headers -Method Post -Uri "https://$gitserver/api/v4/projects?namespace_id=$groupID&name=$projectName"
-    write-output "SUCCESS: Project has been successfully created!`n"
+    $proj = Invoke-RestMethod -Headers $headers -Method Post -Uri "https://$gitserver/api/v4/projects?namespace_id=$groupID&name=$projectName"
+    write-output "SUCCESS: Project has been successfully created!"
 }
 catch {
     Write-Error -Message $_
@@ -119,5 +98,4 @@ catch {
 }
 
 write-output "(5/5) Deployment completed. Detailed info outputed below:"
-$projDetails = Invoke-RestMethod -Headers $headers -Uri "https://$gitserver/api/v4/projects?search=$createdProject.name"
-$projDetails
+$proj
